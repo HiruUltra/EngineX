@@ -1,0 +1,19 @@
+{
+  "name": "enginex-platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "lint": "npm run lint -w backend && npm run lint -w frontend",
+    "test": "npm run test -w backend",
+    "seed": "npm run seed -w backend"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "prettier": "^3.3.3"
+  }
+}

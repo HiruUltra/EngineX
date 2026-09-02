@@ -1,0 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  font-family: Inter, Manrope, sans-serif;
+  background: #050505;
+  color: #ffffff;
+}
+.light body { background: #f7f7f8; color: #111827; }
+.focus-ring { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-red focus-visible:ring-offset-2 focus-visible:ring-offset-asphalt; }
+.leaflet-container { min-height: 360px; width: 100%; border-radius: 8px; }

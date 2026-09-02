@@ -1,0 +1,9 @@
+{
+  "name": "EngineX",
+  "short_name": "EngineX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#E21D25",
+  "icons": [{ "src": "/brand/enginex-logo.jpeg", "sizes": "512x512", "type": "image/jpeg" }]
+}

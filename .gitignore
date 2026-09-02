@@ -1,0 +1,8 @@
+node_modules
+.next
+dist
+.env
+coverage
+backend/uploads/*
+!backend/uploads/.gitkeep
+*.log
