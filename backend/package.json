@@ -8,7 +8,8 @@
     "start": "node dist/server.js",
     "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
     "test": "vitest run",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "ensure-demo-logins": "tsx src/ensureDemoLogins.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

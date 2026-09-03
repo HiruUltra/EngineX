@@ -13,15 +13,18 @@ export default function LoginPage() {
   const [show, setShow] = useState(false);
   const router = useRouter();
   const setSession = useAuthStore((s) => s.setSession);
-  async function submit(roleEmail = email) {
+  async function submit(roleEmail = email, rolePassword = password) {
     try {
-      const res = await endpoints.login(roleEmail, password);
+      const res = await endpoints.login(roleEmail, rolePassword);
       setSession(res.data.data.user, res.data.data.accessToken);
       toast.success("Welcome to EngineX");
       const role = res.data.data.user.role;
       router.push(role === "MECHANIC" ? "/mechanic" : role === "MANAGER" ? "/manager" : role === "ADMIN" ? "/admin" : "/dashboard");
-    } catch {
-      toast.error("Login failed. Check the API server and credentials.");
+    } catch (error) {
+      const message = typeof error === "object" && error && "response" in error
+        ? (error as { response?: { data?: { error?: { message?: string } } } }).response?.data?.error?.message
+        : undefined;
+      toast.error(message || "Login failed. Check the API server and credentials.");
     }
   }
   return (
@@ -31,7 +34,7 @@ export default function LoginPage() {
         <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
         <div className="relative"><Input type={show ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" /><button className="absolute right-3 top-3" onClick={() => setShow(!show)}><Eye size={18} /></button></div>
         <Button onClick={() => submit()}><LogIn size={18} /> Login</Button>
-        {process.env.NODE_ENV === "development" && <div className="grid grid-cols-2 gap-2 text-sm">{["customer@enginex.lk", "mechanic@enginex.lk", "manager@enginex.lk", "admin@enginex.lk"].map((mail) => <button key={mail} onClick={() => submit(mail)} className="rounded-md border border-white/10 p-2">{mail.split("@")[0]}</button>)}</div>}
+        {process.env.NODE_ENV === "development" && <div className="grid grid-cols-2 gap-2 text-sm">{["customer@enginex.lk", "mechanic@enginex.lk", "manager@enginex.lk", "admin@enginex.lk"].map((mail) => <button key={mail} onClick={() => submit(mail, "EngineXDemo123!")} className="rounded-md border border-white/10 p-2">{mail.split("@")[0]}</button>)}</div>}
       </div>
     </section></Shell>
   );

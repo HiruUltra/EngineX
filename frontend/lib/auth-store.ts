@@ -1,5 +1,6 @@
 "use client";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { User } from "@/types/api";
 
 type AuthState = {
@@ -9,7 +10,12 @@ type AuthState = {
   logout: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  setSession: (user, accessToken) => set({ user, accessToken }),
-  logout: () => set({ user: undefined, accessToken: undefined })
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      setSession: (user, accessToken) => set({ user, accessToken }),
+      logout: () => set({ user: undefined, accessToken: undefined })
+    }),
+    { name: "enginex-session" }
+  )
+);
