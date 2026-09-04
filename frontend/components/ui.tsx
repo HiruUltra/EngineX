@@ -44,16 +44,30 @@ function useSidebarHidden() {
 export function Shell({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user);
   const [sidebarHidden] = useSidebarHidden();
-  return <main className={cn("min-h-screen bg-zinc-50 text-zinc-950 dark:bg-asphalt dark:text-white", user && !sidebarHidden && "lg:pl-64")}>{children}</main>;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const hasSidebar = mounted && Boolean(user) && !sidebarHidden;
+  return <main className={cn("min-h-screen bg-zinc-50 text-zinc-950 dark:bg-asphalt dark:text-white", hasSidebar && "lg:pl-64")}>{children}</main>;
 }
 
 export function Nav() {
   const router = useRouter();
   const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
-  const { user, logout } = useAuthStore();
+  const { user: storedUser, logout } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarHidden, setSidebarHidden] = useSidebarHidden();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const user = mounted ? storedUser : undefined;
   const home = user?.role === "MECHANIC" ? "/mechanic" : user?.role === "MANAGER" ? "/manager" : user?.role === "ADMIN" ? "/admin" : user ? "/dashboard" : "/";
   const links = user ? [
     { href: home, label: "Overview" },
@@ -119,7 +133,7 @@ export function Nav() {
         </Link>
         <div className="flex items-center gap-1 text-sm sm:gap-2">
           <button type="button" onClick={toggleTheme} aria-label="Toggle light and dark mode" title="Toggle light and dark mode" className="focus-ring inline-flex size-11 items-center justify-center rounded-md bg-zinc-200 text-zinc-700 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-            {resolvedTheme === "dark" ? <Sun size={19} /> : <Moon size={19} />}
+            {mounted ? (resolvedTheme === "dark" ? <Sun size={19} /> : <Moon size={19} />) : <span className="size-[19px]" />}
           </button>
           {user ? <>
             <div className={cn("hidden items-center gap-2 sm:flex", user.role === "CUSTOMER" && "lg:hidden")}>
