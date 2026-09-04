@@ -28,11 +28,12 @@ export default function ManagerPage() {
     onError: () => toast.error("Could not update request")
   });
   const verify = useMutation({
-    mutationFn: ({ id, isVerified }: { id: string; isVerified: boolean }) => endpoints.updateMechanicApplication(id, {
+    mutationFn: ({ id, isVerified, rejectionReason }: { id: string; isVerified: boolean; rejectionReason?: string }) => endpoints.updateMechanicApplication(id, {
       isVerified,
       isOnline: isVerified,
-      skills: ["engine", "battery", "tyres", "electrical"],
-      supportedVehicleTypes: ["motorcycle", "three-wheeler", "car", "van", "truck"]
+      skills: isVerified ? ["engine", "battery", "tyres", "electrical"] : undefined,
+      supportedVehicleTypes: isVerified ? ["motorcycle", "three-wheeler", "car", "van", "truck"] : undefined,
+      ...(rejectionReason ? { rejectionReason } : {})
     }),
     onSuccess: () => {
       toast.success("Mechanic application updated");
@@ -84,7 +85,7 @@ export default function ManagerPage() {
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {applications.isLoading ? <div className="rounded-md bg-zinc-100 p-4 dark:bg-asphalt">Loading applications...</div> : null}
         {!applications.isLoading && !applications.data?.length ? <div className="rounded-md bg-zinc-100 p-4 text-zinc-500 dark:bg-asphalt dark:text-metallic">No mechanic applications yet.</div> : null}
-        {applications.data?.map((profile) => <MechanicApplicationCard key={profile._id} profile={profile} busy={verify.isPending} onVerify={(isVerified) => verify.mutate({ id: profile._id, isVerified })} />)}
+        {applications.data?.map((profile) => <MechanicApplicationCard key={profile._id} profile={profile} busy={verify.isPending} onVerify={(isVerified, rejectionReason) => verify.mutate({ id: profile._id, isVerified, rejectionReason })} />)}
       </div>
     </section>
     <div className="mt-6 grid gap-4 lg:grid-cols-[220px_1fr]">
@@ -101,19 +102,30 @@ export default function ManagerPage() {
   </section></Shell>;
 }
 
-function MechanicApplicationCard({ profile, busy, onVerify }: { profile: MechanicProfile; busy: boolean; onVerify: (isVerified: boolean) => void }) {
+function MechanicApplicationCard({ profile, busy, onVerify }: { profile: MechanicProfile; busy: boolean; onVerify: (isVerified: boolean, reason?: string) => void }) {
+  const statusColor: Record<string, string> = {
+    approved: "bg-emerald-600 text-white",
+    pending_verification: "bg-amber-500 text-black",
+    payment_pending: "bg-zinc-500 text-white",
+    rejected: "bg-red-600 text-white"
+  };
+  const ps = profile.profileStatus ?? (profile.isVerified ? "approved" : "pending_verification");
   return <article className="rounded-md bg-zinc-100 p-4 dark:bg-asphalt">
     <div className="flex items-start justify-between gap-3">
       <div>
         <p className="font-semibold">{profile.user.name}</p>
         <p className="text-sm text-zinc-500 dark:text-metallic">{profile.user.email}</p>
-        <p className="mt-2 text-sm">{profile.isVerified ? "Approved mechanic" : "Pending approval"}</p>
+        <p className="text-sm text-zinc-500 dark:text-metallic">{profile.user.phone}</p>
+        {profile.skills?.length ? <p className="mt-2 text-xs text-zinc-500 dark:text-metallic">Skills: {profile.skills.join(", ")}</p> : null}
+        {profile.supportedVehicleTypes?.length ? <p className="text-xs text-zinc-500 dark:text-metallic">Vehicles: {profile.supportedVehicleTypes.join(", ")}</p> : null}
+        {ps === "rejected" && profile.rejectionReason ? <p className="mt-2 rounded bg-red-500/10 px-2 py-1 text-xs text-red-500">Reason: {profile.rejectionReason}</p> : null}
       </div>
-      <span className={`rounded-md px-2 py-1 text-xs font-bold ${profile.isVerified ? "bg-emerald-600 text-white" : "bg-amber-500 text-black"}`}>{profile.isVerified ? "APPROVED" : "PENDING"}</span>
+      <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold ${statusColor[ps] || "bg-zinc-400 text-white"}`}>{ps.replace(/_/g, " ").toUpperCase()}</span>
     </div>
+    {profile.registrationPayment ? <p className="mt-2 text-xs text-emerald-500">✓ Registration fee paid ({(profile.registrationPayment as { receiptNumber?: string }).receiptNumber || "—"})</p> : <p className="mt-2 text-xs text-amber-500">⚠ Registration fee not paid</p>}
     <div className="mt-4 grid gap-2 sm:grid-cols-2">
-      <Button type="button" disabled={busy || profile.isVerified} onClick={() => onVerify(true)} className="shadow-none"><UserCheck size={16} /> Approve</Button>
-      <Button type="button" disabled={busy || !profile.isVerified} onClick={() => onVerify(false)} className="bg-zinc-700 shadow-none"><UserX size={16} /> Suspend</Button>
+      <Button type="button" disabled={busy || ps === "approved"} onClick={() => onVerify(true)} className="shadow-none"><UserCheck size={16} /> Approve</Button>
+      <Button type="button" disabled={busy || ps === "rejected"} onClick={() => { const reason = window.prompt("Rejection reason (optional):") || ""; onVerify(false, reason); }} className="bg-zinc-700 shadow-none"><UserX size={16} /> Reject</Button>
     </div>
   </article>;
 }

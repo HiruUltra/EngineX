@@ -76,6 +76,9 @@ export function Nav() {
       { href: "/vehicles", label: "My vehicles" },
       { href: "/history", label: "Request history" }
     ] : []),
+    ...(user.role === "MECHANIC" || user.role === "MANAGER" || user.role === "ADMIN" ? [
+      { href: "/map", label: "Live map" }
+    ] : []),
     { href: "/profile", label: "Profile" }
   ] : [];
 

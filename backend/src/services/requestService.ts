@@ -5,6 +5,8 @@ import { Vehicle } from "../models/Vehicle.js";
 import { Inspection, Payment, Quotation, Review } from "../models/WorkflowModels.js";
 import type { RequestStatus } from "../models/types.js";
 import { AppError } from "../utils/http.js";
+import { haversineKm } from "../utils/geo.js";
+import { notifyNearbyMechanics } from "./notificationService.js";
 
 const transitions: Record<RequestStatus, RequestStatus[]> = {
   DRAFT: ["SEARCHING", "CANCELLED_BY_CUSTOMER"],
@@ -52,13 +54,16 @@ export async function createAssistanceRequest(customerId: string, input: {
 }
 
 export async function assignNearbyMechanic(requestId: string) {
-  const request = await ServiceRequest.findById(requestId).populate("vehicle");
+  const request = await ServiceRequest.findById(requestId).populate("vehicle customer");
   if (!request) throw new AppError(404, "Request not found");
   const vehicleType = (request.vehicle as unknown as { vehicleType: string }).vehicleType;
+  const customer = request.customer as unknown as { name: string; phone: string };
   const [longitude, latitude] = request.breakdownLocation.coordinates;
-  const candidates = await MechanicProfile.find({
+
+  let candidates = await MechanicProfile.find({
     isVerified: true,
     isOnline: true,
+    profileStatus: "approved",
     activeRequest: { $exists: false },
     supportedVehicleTypes: vehicleType,
     currentLocation: {
@@ -68,6 +73,34 @@ export async function assignNearbyMechanic(requestId: string) {
       }
     }
   }).populate("user").limit(8);
+
+  // Fallback: if no mechanic within 50km (e.g. testing from overseas coordinates), assign closest available verified mechanic
+  if (!candidates.length) {
+    candidates = await MechanicProfile.find({
+      isVerified: true,
+      isOnline: true,
+      profileStatus: "approved",
+      activeRequest: { $exists: false },
+      supportedVehicleTypes: vehicleType
+    }).populate("user").limit(8);
+  }
+
+  // Notify ALL nearby candidates (SMS + call + email)
+  if (candidates.length > 0) {
+    const targets = candidates.map((c) => {
+      const u = c.user as unknown as { name: string; phone: string; email: string };
+      return { name: u.name, phone: u.phone, email: u.email };
+    });
+    notifyNearbyMechanics(targets, {
+      requestId,
+      customerName: customer?.name || "Customer",
+      customerPhone: customer?.phone || "N/A",
+      problemCategory: request.problemCategory,
+      address: request.address,
+      latitude,
+      longitude
+    }).catch((err) => console.error("[notify] Failed:", err));
+  }
 
   if (!candidates.length) {
     request.currentStatus = "NO_MECHANIC_AVAILABLE";
@@ -79,12 +112,19 @@ export async function assignNearbyMechanic(requestId: string) {
   const best = candidates
     .map((profile, index) => ({ profile, score: profile.rating * 10 - profile.workload * 3 - index }))
     .sort((a, b) => b.score - a.score)[0];
+
+  const mechanicLoc = best.profile.currentLocation?.coordinates;
+  const distanceKm = mechanicLoc
+    ? haversineKm(mechanicLoc[0], mechanicLoc[1], longitude, latitude)
+    : 5.0;
+  const estimatedArrivalMinutes = Math.round((distanceKm / 30) * 60); // ~30 km/h city speed
+
   best.profile.set("activeRequest", request._id);
   await best.profile.save();
   request.set("assignedMechanic", best.profile.user);
   request.currentStatus = "ASSIGNED";
-  request.estimatedDistanceKm = 4.2;
-  request.estimatedArrivalMinutes = 14;
+  request.estimatedDistanceKm = Math.round(distanceKm * 10) / 10;
+  request.estimatedArrivalMinutes = estimatedArrivalMinutes;
   request.assignmentAttempts.push({ mechanic: best.profile.user as Types.ObjectId, score: best.score, at: new Date() });
   request.statusHistory.push({ status: "ASSIGNED", changedBy: best.profile.user as Types.ObjectId, note: "Automatic nearby assignment" });
   await request.save();

@@ -9,7 +9,7 @@ export const registerSchema = z.object({
   role: z.enum(roles).default("CUSTOMER")
 });
 
-export const loginSchema = z.object({ email: z.string().email(), password: z.string().min(1) });
+export const loginSchema = z.object({ email: z.string().min(3), password: z.string().min(1) });
 
 export const vehicleSchema = z.object({
   registrationNumber: z.string().min(2),
@@ -32,8 +32,8 @@ export const createRequestSchema = z.object({
   description: z.string().min(5),
   urgency: z.enum(["low", "normal", "high", "emergency"]).default("normal"),
   address: z.string().min(3),
-  longitude: z.number().min(79).max(82),
-  latitude: z.number().min(5).max(10),
+  longitude: z.number().min(-180).max(180),
+  latitude: z.number().min(-90).max(90),
   images: z.array(z.string()).max(5).default([])
 });
 
