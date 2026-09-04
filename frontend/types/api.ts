@@ -69,4 +69,6 @@ export type ServiceRequest = {
   statusHistory: { status: string; note?: string; at?: string }[];
   quotation?: { _id: string; labourFee: number; partsCost: number; serviceFee: number; taxes: number; total: number; status: string };
   payment?: { _id: string; amount: number; method: string; status: string; receiptNumber?: string };
+  createdAt?: string;
+  updatedAt?: string;
 };

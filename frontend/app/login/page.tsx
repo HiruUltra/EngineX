@@ -64,14 +64,14 @@ export default function LoginPage() {
 
         <div className="mt-6 grid gap-3">
           <div className="relative">
-            <Mail size={16} className="absolute left-3 top-3.5 text-zinc-400" />
+            <Mail size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
             <Input
               id="input-email"
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="Email address or Phone number"
-              className="pl-9"
+              className="pl-10"
             />
           </div>
           <div className="relative">
@@ -81,11 +81,12 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
+              className="pr-10"
             />
             <button
               type="button"
               aria-label="Toggle password visibility"
-              className="absolute right-3 top-3"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-white"
               onClick={() => setShow(!show)}
             >
               <Eye size={18} />

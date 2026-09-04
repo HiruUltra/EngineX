@@ -21,20 +21,20 @@ export default function LiveMapPage() {
     <Shell>
       <Nav />
       <section className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-engine-red">Live Operations</p>
-            <h1 className="mt-1 font-display text-4xl font-bold">Field Map</h1>
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-engine-red">Live Operations</p>
+            <h1 className="mt-1 font-display text-3xl sm:text-4xl font-bold">Field Map</h1>
           </div>
-          <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-metallic">
-            <span className="flex items-center gap-2"><span className="size-3 rounded-full bg-emerald-500 inline-block" /> {mechanics.data?.length ?? 0} mechanics online</span>
-            <span className="flex items-center gap-2"><span className="size-3 rounded-full bg-engine-red inline-block" /> {breakdowns.data?.length ?? 0} active breakdowns</span>
+          <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-zinc-500 dark:text-metallic">
+            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-emerald-500 inline-block" /> {mechanics.data?.length ?? 0} mechanics</span>
+            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-engine-red inline-block" /> {breakdowns.data?.length ?? 0} breakdowns</span>
             <button
               type="button"
               onClick={() => { mechanics.refetch(); breakdowns.refetch(); }}
-              className="flex items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 hover:bg-zinc-100 dark:border-white/10 dark:hover:bg-white/5"
+              className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 hover:bg-zinc-100 dark:border-white/10 dark:hover:bg-white/5"
             >
-              <RefreshCw size={15} /> Refresh
+              <RefreshCw size={14} /> Refresh
             </button>
           </div>
         </div>

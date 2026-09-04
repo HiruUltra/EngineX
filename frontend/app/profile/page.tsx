@@ -65,15 +65,27 @@ export default function ProfilePage() {
         />
         <Button type="button" onClick={() => fileRef.current?.click()} disabled={upload.isPending} className="shadow-none"><Camera size={18} /> Set picture</Button>
       </div>
-      <div className="grid content-start gap-3">
-        <Input placeholder="Name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
-        <Input placeholder="Phone" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} />
-        <Input placeholder="Profile picture URL" value={form.avatarUrl} onChange={(event) => setForm({ ...form, avatarUrl: event.target.value })} />
-        <Select value={form.theme} onChange={(event) => setForm({ ...form, theme: event.target.value })} aria-label="Theme">
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-          <option value="system">System</option>
-        </Select>
+      <div className="grid content-start gap-4">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Full Name</label>
+          <Input placeholder="Full Name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Email (Account)</label>
+          <Input disabled value={user?.email || ""} className="cursor-not-allowed opacity-75" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Phone Number</label>
+          <Input placeholder="Phone Number" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Theme Preference</label>
+          <Select value={form.theme} onChange={(event) => setForm({ ...form, theme: event.target.value })} aria-label="Theme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="system">System</option>
+          </Select>
+        </div>
         <Button type="button" onClick={() => save.mutate()} disabled={save.isPending}><Save size={18} /> Save profile</Button>
       </div>
     </div>

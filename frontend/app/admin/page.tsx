@@ -39,7 +39,7 @@ export default function AdminPage() {
   const pending = applications.data?.filter((profile) => !profile.isVerified).length || 0;
 
   return <Shell><Nav /><section className="mx-auto max-w-7xl px-4 py-8"><h1 className="font-display text-4xl font-bold">Administrator Portal</h1>
-    <div className="mt-6 grid gap-4 sm:grid-cols-4"><Stat label="Users" value={analytics.data?.users || 0} /><Stat label="Requests" value={analytics.data?.requests || 0} /><Stat label="Active jobs" value={analytics.data?.active || 0} /><Stat label="Pending mechanics" value={pending} /></div>
+    <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4"><Stat label="Users" value={analytics.data?.users || 0} /><Stat label="Requests" value={analytics.data?.requests || 0} /><Stat label="Active jobs" value={analytics.data?.active || 0} /><Stat label="Pending mechanics" value={pending} /></div>
     <section className="mt-6 rounded-lg border border-white/10 bg-white p-5 dark:bg-panel">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><Users /> User management</h2>

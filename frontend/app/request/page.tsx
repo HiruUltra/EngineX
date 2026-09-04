@@ -82,11 +82,25 @@ export default function RequestPage() {
 
   return <Shell><Nav /><section className="mx-auto max-w-4xl px-4 py-8">
     <h1 className="font-display text-4xl font-bold">Request Assistance</h1>
-    <div className="mt-5 grid grid-cols-5 gap-2 text-xs">{steps.map((s, i) => <div key={s} className="rounded-md bg-panel p-2 text-center text-white">{i + 1}. {s}</div>)}</div>
-    <div className="mt-6 grid gap-4 rounded-lg border border-white/10 bg-white p-5 dark:bg-panel">
+    <div className="mt-5 grid grid-cols-5 gap-1.5 text-[10px] font-semibold sm:gap-2 sm:text-xs">{steps.map((s, i) => <div key={s} className="truncate rounded-md bg-zinc-200 p-2 text-center text-zinc-800 dark:bg-panel dark:text-white">{i + 1}. {s}</div>)}</div>
+    <div className="mt-6 grid gap-4 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-panel sm:p-6">
       <Button onClick={detect} className="w-full"><LocateFixed size={18} /> Detect current GPS location</Button>
-      <div className="grid gap-3 sm:grid-cols-3"><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /><Input type="number" value={form.longitude} onChange={(e) => setForm({ ...form, longitude: Number(e.target.value) })} /><Input type="number" value={form.latitude} onChange={(e) => setForm({ ...form, latitude: Number(e.target.value) })} /></div>
-      <div className="grid gap-2">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Address / Landmark</label>
+          <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Address" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Longitude</label>
+          <Input type="number" step="any" value={form.longitude} onChange={(e) => setForm({ ...form, longitude: Number(e.target.value) })} placeholder="Longitude" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Latitude</label>
+          <Input type="number" step="any" value={form.latitude} onChange={(e) => setForm({ ...form, latitude: Number(e.target.value) })} placeholder="Latitude" />
+        </div>
+      </div>
+      <div className="grid gap-1">
+        <label className="block text-xs font-medium text-zinc-500 dark:text-metallic">Vehicle</label>
         <Select
           value={selectedVehicle}
           onChange={(e) => setForm({ ...form, vehicle: e.target.value })}
@@ -101,11 +115,23 @@ export default function RequestPage() {
         {!vehicles.isLoading && !hasVehicles ? <Link href="/vehicles" className="text-sm font-semibold text-engine-red">Add a vehicle first</Link> : null}
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
-        <Select value={form.problemCategory} onChange={(e) => setForm({ ...form, problemCategory: e.target.value })}>{["engine problem", "battery issue", "flat tyre", "overheating", "fuel problem", "electrical fault", "brake issue", "accident damage", "towing request", "unknown problem", "other"].map((v) => <option key={v}>{v}</option>)}</Select>
-        <Select value={form.urgency} onChange={(e) => setForm({ ...form, urgency: e.target.value })}>{["low", "normal", "high", "emergency"].map((v) => <option key={v}>{v}</option>)}</Select>
-        <Select value={form.serviceType} onChange={(e) => setForm({ ...form, serviceType: e.target.value })}>{["inspection", "repair", "towing"].map((v) => <option key={v}>{v}</option>)}</Select>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Problem</label>
+          <Select value={form.problemCategory} onChange={(e) => setForm({ ...form, problemCategory: e.target.value })}>{["engine problem", "battery issue", "flat tyre", "overheating", "fuel problem", "electrical fault", "brake issue", "accident damage", "towing request", "unknown problem", "other"].map((v) => <option key={v}>{v}</option>)}</Select>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Urgency</label>
+          <Select value={form.urgency} onChange={(e) => setForm({ ...form, urgency: e.target.value })}>{["low", "normal", "high", "emergency"].map((v) => <option key={v}>{v}</option>)}</Select>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Service type</label>
+          <Select value={form.serviceType} onChange={(e) => setForm({ ...form, serviceType: e.target.value })}>{["inspection", "repair", "towing"].map((v) => <option key={v}>{v}</option>)}</Select>
+        </div>
       </div>
-      <Input placeholder="Describe the problem" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+      <div>
+        <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-metallic">Problem description</label>
+        <Input placeholder="Describe what happened (e.g. Engine won't crank, smoke from hood)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+      </div>
       <div className="grid gap-3 rounded-md border border-dashed border-zinc-300 p-4 text-sm dark:border-white/20">
         <input
           ref={cameraInputRef}

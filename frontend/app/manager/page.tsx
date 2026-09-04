@@ -75,7 +75,7 @@ export default function ManagerPage() {
   }
 
   return <Shell><Nav /><section className="mx-auto max-w-7xl px-4 py-8"><h1 className="font-display text-4xl font-bold">Service Center Operations</h1>
-    <div className="mt-6 grid gap-4 sm:grid-cols-4"><Stat label="Active requests" value={analytics.data?.active || 0} /><Stat label="Completed" value={analytics.data?.completed || 0} /><Stat label="Revenue" value={`LKR ${analytics.data?.revenue || 0}`} /><Stat label="Satisfaction" value={analytics.data?.satisfaction || 0} /></div>
+    <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4"><Stat label="Active requests" value={analytics.data?.active || 0} /><Stat label="Completed" value={analytics.data?.completed || 0} /><Stat label="Revenue" value={`LKR ${analytics.data?.revenue || 0}`} /><Stat label="Satisfaction" value={analytics.data?.satisfaction || 0} /></div>
     <div className="mt-6 h-72 rounded-lg bg-white p-4 dark:bg-panel"><ResponsiveContainer><AreaChart data={data}><XAxis dataKey="name" /><YAxis /><Area dataKey="jobs" fill="#E21D25" stroke="#FF2A2A" /></AreaChart></ResponsiveContainer></div>
     <section className="mt-6 rounded-lg border border-white/10 bg-white p-5 dark:bg-panel">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

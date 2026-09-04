@@ -14,12 +14,28 @@ export function Button({ className, ...props }: React.ButtonHTMLAttributes<HTMLB
   return <button className={cn("focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-action-red px-4 py-2 font-semibold text-white shadow-red disabled:opacity-50", className)} {...props} />;
 }
 
-export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input className="focus-ring min-h-11 w-full rounded-md border border-white/10 bg-white px-3 text-sm text-zinc-950 placeholder:text-zinc-500 dark:bg-panel dark:text-white" {...props} />;
+export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      className={cn(
+        "focus-ring min-h-11 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-950 placeholder:text-zinc-400 transition-colors dark:border-white/10 dark:bg-panel dark:text-white dark:placeholder:text-zinc-500",
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
-export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className="focus-ring min-h-11 w-full rounded-md border border-white/10 bg-white px-3 text-sm text-zinc-950 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-panel dark:text-white [&>option]:bg-white [&>option]:text-zinc-950 dark:[&>option]:bg-panel dark:[&>option]:text-white" {...props} />;
+export function Select({ className, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select
+      className={cn(
+        "focus-ring min-h-11 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-950 transition-colors disabled:cursor-not-allowed disabled:opacity-70 dark:border-white/10 dark:bg-panel dark:text-white [&>option]:bg-white [&>option]:text-zinc-950 dark:[&>option]:bg-panel dark:[&>option]:text-white",
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
 function useSidebarHidden() {
