@@ -3,7 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
 html, body { min-height: 100%; }
 body {
   margin: 0;
@@ -13,4 +14,14 @@ body {
 }
 .light body { background: #f7f7f8; color: #111827; }
 .focus-ring { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-red focus-visible:ring-offset-2 focus-visible:ring-offset-asphalt; }
-.leaflet-container { min-height: 360px; width: 100%; border-radius: 8px; }
+.leaflet-container { min-height: 290px; width: 100%; border-radius: 16px; }
+.rescue-pulse { position: relative; isolation: isolate; transition: transform 180ms ease, box-shadow 180ms ease; }
+.rescue-pulse::before, .rescue-pulse::after { position: absolute; z-index: -1; content: ""; inset: -12px; border: 1px solid rgba(255, 49, 56, 0.35); border-radius: 9999px; animation: rescue-pulse 2.8s ease-out infinite; }
+.rescue-pulse::after { animation-delay: 1.4s; }
+.rescue-pulse:hover { transform: scale(1.03); }
+.service-tile { display: flex; min-width: 210px; min-height: 84px; align-items: center; gap: 12px; border: 1px solid rgba(128, 128, 128, 0.18); border-radius: 12px; background: rgba(255, 255, 255, 0.8); padding: 14px; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
+.dark .service-tile { background: #13171d; border-color: rgba(255, 255, 255, 0.08); }
+.service-tile:hover { transform: translateY(-2px); border-color: rgba(237, 28, 36, 0.45); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12); }
+.location-card { background-image: linear-gradient(rgba(127, 127, 127, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(127, 127, 127, 0.08) 1px, transparent 1px); background-size: 32px 32px; }
+@keyframes rescue-pulse { 0% { opacity: 0.7; transform: scale(0.92); } 75%, 100% { opacity: 0; transform: scale(1.4); } }
+@media (prefers-reduced-motion: reduce) { .rescue-pulse::before, .rescue-pulse::after { animation: none; } .rescue-pulse, .service-tile { transition: none; } }

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -17,6 +17,10 @@ export default function RequestPage() {
   const selectedVehicle = form.vehicle || vehicles.data?.[0]?._id || "";
   const hasVehicles = Boolean(vehicles.data?.length);
   const steps = useMemo(() => ["Location", "Vehicle", "Problem", "Photos", "Review"], []);
+  useEffect(() => {
+    const service = new URLSearchParams(window.location.search).get("service");
+    if (service) setForm((current) => ({ ...current, problemCategory: service }));
+  }, []);
   const create = useMutation({
     mutationFn: () => endpoints.createRequest({
       ...form,

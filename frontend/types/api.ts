@@ -17,6 +17,7 @@ export type MechanicProfile = {
 export type ServiceRequest = {
   _id: string; customer: string; vehicle: Vehicle; assignedMechanic?: User; serviceType: string;
   problemCategory: string; description: string; urgency: string; address: string; currentStatus: string;
+  breakdownLocation?: { type?: string; coordinates?: [number, number] };
   estimatedDistanceKm?: number; estimatedArrivalMinutes?: number; statusHistory: { status: string; note?: string; at?: string }[];
   quotation?: { _id: string; labourFee: number; partsCost: number; serviceFee: number; taxes: number; total: number; status: string };
   payment?: { _id: string; amount: number; method: string; status: string; receiptNumber?: string };
