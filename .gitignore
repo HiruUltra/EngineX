@@ -6,4 +6,4 @@ coverage
 backend/uploads/*
 !backend/uploads/.gitkeep
 *.log
-.env.local
+**/.env.local
