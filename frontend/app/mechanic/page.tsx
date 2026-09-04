@@ -42,20 +42,33 @@ export default function MechanicPage() {
     onError: () => toast.error("Could not send quote")
   });
 
-  const isPendingApproval = profile.data && !profile.data.isVerified;
+  const profileStatus = profile.data?.profileStatus ?? "payment_pending";
+  const isPaymentPending = profileStatus === "payment_pending";
+  const isPendingVerification = profileStatus === "pending_verification";
+  const isApproved = profileStatus === "approved";
+  const isRejected = profileStatus === "rejected";
 
   return <Shell><Nav /><section className="mx-auto max-w-6xl px-4 py-8"><h1 className="font-display text-4xl font-bold">Mechanic Console</h1>
-    <div className="mt-6 grid gap-4 sm:grid-cols-3"><Stat label="Availability" value={profile.data?.isOnline ? "Online" : "Offline"} /><Stat label="Assigned jobs" value={profile.data?.isVerified ? activeJobs.length : 0} /><Stat label="Application" value={profile.data?.isVerified ? "Approved" : "Pending"} /></div>
-    {isPendingApproval ? <div className="mt-6 rounded-lg border border-amber-500/40 bg-amber-500/10 p-5 text-amber-100">
-      <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><ShieldAlert /> Application pending approval</h2>
-      <p className="mt-2 text-sm text-amber-50/80">An admin or manager must approve this mechanic application before jobs can be assigned.</p>
+    <div className="mt-6 grid gap-4 sm:grid-cols-3"><Stat label="Availability" value={profile.data?.isOnline ? "Online" : "Offline"} /><Stat label="Assigned jobs" value={isApproved ? activeJobs.length : 0} /><Stat label="Status" value={profileStatus.replace(/_/g, " ")} /></div>
+    {isPaymentPending ? <div className="mt-6 rounded-lg border border-amber-500/40 bg-amber-500/10 p-5 text-amber-100">
+      <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><ShieldAlert /> Complete your profile</h2>
+      <p className="mt-2 text-sm text-amber-50/80">Pay the one-time registration fee and submit your profile to start receiving jobs.</p>
+      <Link href="/mechanic/register" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-amber-500 px-5 py-2 font-bold text-black">Set up profile & pay →</Link>
+    </div> : null}
+    {isPendingVerification ? <div className="mt-6 rounded-lg border border-amber-500/40 bg-amber-500/10 p-5 text-amber-100">
+      <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><ShieldAlert /> Application pending manager review</h2>
+      <p className="mt-2 text-sm text-amber-50/80">Your registration fee was received and your profile is awaiting approval by a manager. You will be notified once approved.</p>
+    </div> : null}
+    {isRejected ? <div className="mt-6 rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-red-100">
+      <h2 className="flex items-center gap-2 font-display text-2xl font-bold"><ShieldAlert /> Application rejected</h2>
+      <p className="mt-2 text-sm text-red-50/80">Your application was rejected. Please contact support or re-submit with updated documents.</p>
     </div> : null}
     <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
       <div className="grid gap-3">
         <h2 className="font-display text-2xl font-bold">Assigned jobs</h2>
         {requests.isLoading ? <div className="rounded-lg border border-white/10 bg-white p-5 dark:bg-panel">Loading jobs...</div> : null}
-        {!requests.isLoading && !activeJobs.length && !isPendingApproval ? <div className="rounded-lg border border-white/10 bg-white p-5 text-zinc-500 dark:bg-panel dark:text-metallic">No assigned jobs yet.</div> : null}
-        {!isPendingApproval && activeJobs.map((job) => <JobCard
+        {!requests.isLoading && !activeJobs.length && isApproved ? <div className="rounded-lg border border-white/10 bg-white p-5 text-zinc-500 dark:bg-panel dark:text-metallic">No assigned jobs yet.</div> : null}
+        {isApproved && activeJobs.map((job) => <JobCard
           key={job._id}
           job={job}
           busy={status.isPending || quote.isPending}

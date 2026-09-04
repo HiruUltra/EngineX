@@ -32,9 +32,20 @@ const mechanicProfileSchema = new Schema(
     activeRequest: { type: Types.ObjectId, ref: "ServiceRequest" },
     rating: { type: Number, default: 4.8 },
     workload: { type: Number, default: 0 },
-    currentLocation: { type: pointSchema, index: "2dsphere" }
+    currentLocation: { type: pointSchema },
+    // Registration payment & verification workflow
+    profileStatus: {
+      type: String,
+      enum: ["payment_pending", "pending_verification", "approved", "rejected"],
+      default: "payment_pending"
+    },
+    registrationPayment: { type: Types.ObjectId, ref: "RegistrationPayment" },
+    verificationDocs: [{ type: String }],
+    rejectionReason: { type: String }
   },
   { timestamps: true }
 );
+
+mechanicProfileSchema.index({ currentLocation: "2dsphere" });
 
 export const MechanicProfile = mongoose.model("MechanicProfile", mechanicProfileSchema);

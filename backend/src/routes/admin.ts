@@ -59,14 +59,18 @@ adminRoutes.patch("/mechanic-applications/:id", requireRole("MANAGER", "ADMIN"),
     isVerified: z.boolean(),
     isOnline: z.boolean().optional(),
     supportedVehicleTypes: z.array(z.string()).optional(),
-    skills: z.array(z.string()).optional()
+    skills: z.array(z.string()).optional(),
+    rejectionReason: z.string().optional()
   }).parse(req.body);
+  const profileStatus = input.isVerified ? "approved" : "rejected";
   const profile = await MechanicProfile.findByIdAndUpdate(
     req.params.id,
     {
       $set: {
         ...input,
-        isOnline: input.isOnline ?? input.isVerified
+        isOnline: input.isOnline ?? input.isVerified,
+        profileStatus,
+        ...(input.rejectionReason ? { rejectionReason: input.rejectionReason } : {})
       }
     },
     { new: true }

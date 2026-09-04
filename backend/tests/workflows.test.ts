@@ -57,7 +57,7 @@ describe("EngineX workflows", () => {
     const customer = await auth("CUSTOMER");
     const mechanicPassword = await bcrypt.hash("EngineXDemo123!", 4);
     const mechanic = await User.create({ name: "Mechanic", email: "mechanic@example.lk", phone: "+94771111111", role: "MECHANIC", passwordHash: mechanicPassword });
-    await MechanicProfile.create({ user: mechanic._id, isVerified: true, isOnline: true, supportedVehicleTypes: ["car"], currentLocation: { type: "Point", coordinates: [79.8612, 6.9271] } });
+    await MechanicProfile.create({ user: mechanic._id, isVerified: true, isOnline: true, profileStatus: "approved", supportedVehicleTypes: ["car"], currentLocation: { type: "Point", coordinates: [79.8612, 6.9271] } });
     const vehicle = await Vehicle.create({ customer: customer.user._id, registrationNumber: "WP CAB-4821", make: "Toyota", model: "Aqua", manufactureYear: 2018, vehicleType: "car", fuelType: "hybrid", transmission: "automatic", colour: "Silver" });
     const res = await request(app).post("/api/v1/requests").set("Authorization", `Bearer ${customer.token}`).send({
       vehicle: String(vehicle._id), serviceType: "repair", problemCategory: "battery issue", description: "Vehicle will not start",

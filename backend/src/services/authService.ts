@@ -24,13 +24,58 @@ export async function register(input: { name: string; email: string; phone: stri
     passwordHash: await bcrypt.hash(input.password, 12)
   });
   if (user.role === "CUSTOMER") await CustomerProfile.create({ user: user._id, notificationPreferences: { sms: true, email: true, push: true } });
-  if (user.role === "MECHANIC") await MechanicProfile.create({ user: user._id, skills: [], supportedVehicleTypes: [], isVerified: false });
+  if (user.role === "MECHANIC") await MechanicProfile.create({ user: user._id, skills: [], supportedVehicleTypes: [], isVerified: false, profileStatus: "payment_pending" });
   return createSession(user.id);
 }
 
-export async function login(email: string, password: string) {
-  const user = await User.findOne({ email: email.toLowerCase() }).select("+passwordHash");
-  if (!user || !(await bcrypt.compare(password, user.passwordHash))) throw new AppError(401, "Invalid email or password");
+export async function loginWithGoogle(googleId: string, email: string, name: string, avatarUrl?: string, role: Role = "CUSTOMER") {
+  let user = await User.findOne({ googleId });
+  if (!user) {
+    user = await User.findOne({ email: email.toLowerCase() });
+    if (user) {
+      user.googleId = googleId;
+      if (avatarUrl && !user.avatarUrl) user.avatarUrl = avatarUrl;
+      await user.save();
+    } else {
+      user = await User.create({
+        name,
+        email: email.toLowerCase(),
+        phone: "N/A",
+        role,
+        googleId,
+        avatarUrl,
+        phoneVerified: false
+      });
+      if (role === "CUSTOMER") await CustomerProfile.create({ user: user._id, notificationPreferences: { sms: true, email: true, push: true } });
+      if (role === "MECHANIC") await MechanicProfile.create({ user: user._id, skills: [], supportedVehicleTypes: [], isVerified: false, profileStatus: "payment_pending" });
+    }
+  }
+  return createSession(user.id);
+}
+
+export async function loginWithAuth0(auth0Sub: string, email: string, name: string, phone = "N/A", role: Role = "CUSTOMER") {
+  // Upsert user by auth0Sub
+  let user = await User.findOne({ auth0Sub });
+  if (!user) {
+    // Try by email
+    user = await User.findOne({ email: email.toLowerCase() });
+    if (user) {
+      user.auth0Sub = auth0Sub;
+      await user.save();
+    } else {
+      user = await User.create({ name, email: email.toLowerCase(), phone, role, auth0Sub, phoneVerified: true });
+      if (role === "CUSTOMER") await CustomerProfile.create({ user: user._id, notificationPreferences: { sms: true, email: true, push: true } });
+      if (role === "MECHANIC") await MechanicProfile.create({ user: user._id, skills: [], supportedVehicleTypes: [], isVerified: false, profileStatus: "payment_pending" });
+    }
+  }
+  return createSession(user.id);
+}
+
+export async function login(identifier: string, password: string) {
+  const user = await User.findOne({
+    $or: [{ email: identifier.toLowerCase() }, { phone: identifier.trim() }]
+  }).select("+passwordHash");
+  if (!user || !user.passwordHash || !(await bcrypt.compare(password, user.passwordHash))) throw new AppError(401, "Invalid email, phone or password");
   return createSession(user.id);
 }
 

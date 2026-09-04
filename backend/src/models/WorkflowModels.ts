@@ -84,3 +84,13 @@ export const RefreshToken = mongoose.model("RefreshToken", new Schema({
   expiresAt: { type: Date, required: true },
   revokedAt: Date
 }, { timestamps: true }));
+
+export const RegistrationPayment = mongoose.model("RegistrationPayment", new Schema({
+  mechanic: { type: Types.ObjectId, ref: "User", required: true, index: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: "LKR" },
+  method: { type: String, enum: ["card", "online", "cash"], required: true },
+  status: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
+  receiptNumber: { type: String },
+  paidAt: { type: Date }
+}, { timestamps: true }));

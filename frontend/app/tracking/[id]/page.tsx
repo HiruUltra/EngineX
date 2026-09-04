@@ -30,11 +30,18 @@ export default function TrackingPage({ params }: { params: { id: string } }) {
   const pay = useMutation({ mutationFn: () => endpoints.pay(params.id, "cash"), onSuccess: () => qc.invalidateQueries({ queryKey: ["request", params.id] }) });
   const request = req.data;
   return <Shell><Nav /><section className="mx-auto max-w-7xl px-4 py-6">
-    <div className="grid gap-5 lg:grid-cols-[1fr_420px]"><TrackingMap mechanic={live} customer={[79.8612, 6.9271]} /><aside className="rounded-lg border border-white/10 bg-white p-5 dark:bg-panel">
+    <div className="grid gap-5 lg:grid-cols-[1fr_420px]"><TrackingMap mechanic={live} customer={request?.breakdownLocation?.coordinates || [79.8612, 6.9271]} /><aside className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-panel">
       <h1 className="font-display text-3xl font-bold">{request?.currentStatus || "Live tracking"}</h1>
       <p className="mt-2 text-zinc-500 dark:text-metallic">{request?.address} · {request?.estimatedArrivalMinutes || 14} min · {request?.estimatedDistanceKm || 4.2} km</p>
       <div className="mt-4 rounded-md bg-zinc-100 p-4 dark:bg-asphalt"><p className="font-semibold">{request?.assignedMechanic?.name || "Mechanic assigning"}</p><p className="text-sm text-zinc-500 dark:text-metallic"><Star className="inline text-amber-400" size={16} /> 4.9 · {request?.assignedMechanic?.phone || "+94 demo"}</p></div>
-      <div className="mt-4 grid grid-cols-2 gap-2"><Button><Phone size={18} /> Call</Button><Button className="bg-panel dark:bg-zinc-800"><MessageCircle size={18} /> Chat</Button></div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <a href={request?.assignedMechanic?.phone ? `tel:${request.assignedMechanic.phone}` : "tel:+94770000003"} className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-action-red px-4 py-2 font-semibold text-white shadow-red">
+          <Phone size={18} /> Call
+        </a>
+        <a href={request?.assignedMechanic?.phone ? `sms:${request.assignedMechanic.phone}` : "sms:+94770000003"} className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 font-semibold text-zinc-800 hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">
+          <MessageCircle size={18} /> SMS
+        </a>
+      </div>
       <ol className="mt-5 space-y-2 text-sm">{request?.statusHistory?.map((h, i) => <li key={`${h.status}-${i}`} className="rounded-md bg-zinc-100 p-2 dark:bg-asphalt">{h.status}</li>)}</ol>
       {request?.quotation && <div className="mt-5 rounded-md border border-engine-red/40 p-4"><p className="font-bold">Quote LKR {request.quotation.total}</p><Button className="mt-3 w-full" onClick={() => approve.mutate()}>Approve Quote</Button></div>}
       {request?.currentStatus === "QUOTE_APPROVED" && <Button className="mt-4 w-full" onClick={() => pay.mutate()}><CreditCard size={18} /> Pay test cash receipt</Button>}
